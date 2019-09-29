@@ -6,7 +6,6 @@ class FFNeuralNetwork:
         self.nb_nodes = nb_nodes
         self.nb_input = nb_input
         self.bias = np.ones((nb_nodes, 1))
-        self.output = []
         self.init_weights()
         self.init_grad_weights()
 
@@ -41,9 +40,10 @@ class FFNeuralNetwork:
     def get_grad_weights(self):
         return self.grad_weights
 
-    # init = array berdiri
+    # init = array tiduran
     def feed_forward(self, init):
-        input = init
+        # transpos matrix init
+        input = init.reshape(init.shape[0], 1)
 
         for i in range(len(self.weights) - 1):
             result = np.dot(self.weights[i], input) + self.bias
@@ -51,6 +51,7 @@ class FFNeuralNetwork:
 
             # Ini array of matriks
             self.output.append(input)
+
         result = np.dot(self.weights[-1], input) + 1
         self.output.append(result)
         return result
@@ -60,11 +61,9 @@ class FFNeuralNetwork:
         for i in reversed(range(len(self.weights))):
             if i == len(self.weights) - 1:
                 error = np.sum(self.mean_square_error(Y, Y_pred), axis = 0)
-                print("error = ", error)
             else:
                 # matriks error di pres berdasarkan kolom
                 error = np.sum(self.grad_weights[i + 1] * self.weights[i], axis = 0)
-            
             self.grad_weights[i] = error * self.derivative(self.output[i])
 
     # delta_weights array of matriks diinit 0 pas awal banget
@@ -77,7 +76,7 @@ class FFNeuralNetwork:
             weight += delta_weight
 
     def mean_square_error(self, Y, Y_pred):
-        return (np.square(Y - Y_pred).mean())
+        return np.square(Y - Y_pred).mean()
 
     def create_minibatches(self, data, batch_size):
         minibatches = []
@@ -103,14 +102,20 @@ class FFNeuralNetwork:
             print("weights = ", self.weights)
             minibatches = self.create_minibatches(data, batch_size)
             delta_weights = self.init_delta_weights()
+
             for minibatch in minibatches:
                 X_mini, Y_mini = minibatch
-                for row_x, row_y in zip(X_mini, Y_mini):
-                    row_processed = row_x.reshape(row_x.shape[0], 1)
-                    Y_pred = self.feed_forward(row_processed)
-                    print(Y_pred)
-                    self.backward(row_y, Y_pred)
+
+                for X_train, Y_expected in zip(X_mini, Y_mini):
+                    self.output = []
+
+                    Y_pred = self.feed_forward(X_train)
+                    self.backward(Y_expected, Y_pred)
+
                 self.update_weight(l_rate, delta_weights, momentum)
+
+                # breakpoint buat debug2
+                # import code; code.interact(local=dict(globals(), **locals()))
         
                 
     def predict(self, X):
@@ -136,15 +141,10 @@ nb_nodes = 2
 nb_input = dataset.shape[1] - 1
 FFNN = FFNeuralNetwork(nb_hidden_layer, nb_nodes, nb_input)
 
-epoch = 2
+epoch = 10
 l_rate = 0.001
 momentum = 0.25
-batch_size = 5
+batch_size = 2
 
 FFNN.fit(dataset, epoch, l_rate, momentum, batch_size)
-
-
-
-
-
-
+print(FFNN.predict(dataset[:,:-1]))
