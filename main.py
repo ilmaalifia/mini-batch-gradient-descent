@@ -59,8 +59,8 @@ class FFNeuralNetwork:
     def backward(self, Y, Y_pred):
         for i in reversed(range(len(self.weights))):
             if i == len(self.weights) - 1:
-                error = np.sum(Y - Y_pred, axis = 0)
-
+                error = np.sum(self.mean_square_error(Y, Y_pred), axis = 0)
+                print("error = ", error)
             else:
                 # matriks error di pres berdasarkan kolom
                 error = np.sum(self.grad_weights[i + 1] * self.weights[i], axis = 0)
@@ -76,8 +76,8 @@ class FFNeuralNetwork:
         for weight, delta_weight in zip(self.weights, delta_weights):
             weight += delta_weight
 
-    # def mean_square_error(Y, Y_pred):
-    #     return (np.square(Y - Y_pred).mean())
+    def mean_square_error(self, Y, Y_pred):
+        return (np.square(Y - Y_pred).mean())
 
     def create_minibatches(self, data, batch_size):
         minibatches = []
