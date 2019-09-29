@@ -98,18 +98,18 @@ class FFNeuralNetwork:
         return minibatches 
 
     def fit(self, data, epoch, l_rate, momentum, batch_size):
-        
         for i in range(epoch):
             print("epoch = ", i)
-            print(self.weights)
+            print("weights = ", self.weights)
             minibatches = self.create_minibatches(data, batch_size)
             delta_weights = self.init_delta_weights()
             for minibatch in minibatches:
                 X_mini, Y_mini = minibatch
-                for row in X_mini:
-                    row_processed = row.reshape(row.shape[0], 1)
+                for row_x, row_y in zip(X_mini, Y_mini):
+                    row_processed = row_x.reshape(row_x.shape[0], 1)
                     Y_pred = self.feed_forward(row_processed)
-                    self.backward(Y_mini, Y_pred)
+                    print(Y_pred)
+                    self.backward(row_y, Y_pred)
                 self.update_weight(l_rate, delta_weights, momentum)
         
                 
@@ -142,6 +142,8 @@ momentum = 0.25
 batch_size = 5
 
 FFNN.fit(dataset, epoch, l_rate, momentum, batch_size)
+
+
 
 
 
