@@ -21,13 +21,13 @@ df = convert_categorical_to_numerical(df, 'play')
 # DATA TRAINING
 dataset = df.as_matrix()
 
-nb_hidden_layer = 1
+nb_hidden_layer = 10
 nb_nodes = 4
 nb_input = dataset.shape[1] - 1
 model = FFNeuralNetwork(nb_hidden_layer, nb_nodes, nb_input)
 
-epoch = 20
-l_rate = 0.001
+epoch = 2
+l_rate = 0.1
 momentum = 0.25
 batch_size = 2
 model.fit(dataset, epoch, l_rate, momentum, batch_size)

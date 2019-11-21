@@ -40,21 +40,16 @@ class FFNeuralNetwork:
     def get_grad_weights(self):
         return self.grad_weights
 
-    # init = array tiduran
     def feed_forward(self, init):
         # transpos matrix init
-        input = init.reshape(init.shape[0], 1)
+        output = init.reshape(init.shape[0], 1)
 
-        for i in range(len(self.weights) - 1):
-            result = np.dot(self.weights[i], input) + self.bias
-            input = self.sigmoid(result)
+        for i in range(len(self.weights)):
+            result = np.dot(self.weights[i], output) + 1
+            output = self.sigmoid(result)
+            self.output.append(output)
 
-            # Ini array of matriks
-            self.output.append(input)
-
-        result = np.dot(self.weights[-1], input) + 1
-        self.output.append(result)
-        return result
+        return output
 
     # Y = Y asli satu biji
     def backward(self, Y, Y_pred):
@@ -62,7 +57,6 @@ class FFNeuralNetwork:
             if i == len(self.weights) - 1:
                 error = np.sum(self.mean_square_error(Y, Y_pred), axis = 0)
             else:
-                # matriks error di pres berdasarkan kolom
                 error = np.sum(self.grad_weights[i + 1] * self.weights[i], axis = 0)
             self.grad_weights[i] = error * self.derivative(self.output[i])
 
